@@ -55,7 +55,7 @@ pub enum Restriction {
 pub(crate) struct WrappedResponse<T> {
     pub error: bool,
     pub message: String,
-    pub body: T,
+    pub body: Option<T>,
 }
 
 impl<T> From<WrappedResponse<T>> for crate::Result<T> {
@@ -63,7 +63,7 @@ impl<T> From<WrappedResponse<T>> for crate::Result<T> {
         if val.error {
             Result::Err(crate::Error::PixivError(val.message))
         } else {
-            Result::Ok(val.body)
+            Result::Ok(val.body.unwrap())
         }
     }
 }

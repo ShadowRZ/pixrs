@@ -4,6 +4,8 @@
 pub mod error;
 pub mod types;
 
+use std::str::FromStr;
+
 use regex::Regex;
 use reqwest::{
     header::{HeaderMap, HeaderValue},
@@ -58,6 +60,21 @@ impl PixivClient {
             .json::<WrappedResponse<IllustInfo>>()
             .await?
             .into()
+    }
+
+    /// Get the User ID of the logged in user.
+    pub async fn self_user_id(&self) -> Result<Option<i32>> {
+        let resp = self
+            .client
+            .get(BASE_URL_HTTPS)
+            .send()
+            .await?
+            .error_for_status()?;
+        let headers = resp.headers();
+        Ok(headers
+            .get("x-userid")
+            .and_then(|value| value.to_str().ok())
+            .and_then(|value| <i32 as FromStr>::from_str(value).ok()))
     }
 
     async fn csrf_token(client: &Client) -> Result<String> {

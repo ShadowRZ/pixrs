@@ -34,6 +34,10 @@ impl PixivClient {
             .map_err(|_| crate::Error::Other("Cookies data seems to be invaild"))?;
         cookie.set_sensitive(true);
         headers.append(reqwest::header::COOKIE, cookie);
+        headers.append(
+            reqwest::header::REFERER,
+            HeaderValue::from_static(BASE_URL_HTTPS),
+        );
         let client = Client::builder()
             .user_agent(USER_AGENT)
             .default_headers(headers)

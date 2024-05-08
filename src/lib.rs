@@ -4,6 +4,7 @@
 pub mod error;
 pub mod types;
 
+use regex::Regex;
 use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client,
@@ -18,6 +19,7 @@ pub type Result<T> = std::result::Result<T, crate::Error>;
 /// The client to send Pixiv API requests.
 pub struct PixivClient {
     client: Client,
+    csrf_token: String,
 }
 
 static BASE_URL_HTTPS: &str = "https://www.pixiv.net";
@@ -27,7 +29,7 @@ impl PixivClient {
     /// Creates a new client.
     /// ## Argument
     /// * `token`: The session token on your web session. See the [PixivFE guide](https://pixivfe.pages.dev/obtaining-pixivfe-token/) for how to get it.
-    pub fn new(token: &str) -> Result<Self> {
+    pub async fn new(token: &str) -> Result<Self> {
         let cookie = format!("PHPSESSID={token}");
         let mut headers = HeaderMap::new();
         let mut cookie = HeaderValue::from_str(&cookie)
@@ -42,7 +44,8 @@ impl PixivClient {
             .user_agent(USER_AGENT)
             .default_headers(headers)
             .build()?;
-        Ok(PixivClient { client })
+        let csrf_token = PixivClient::csrf_token(&client).await?;
+        Ok(PixivClient { client, csrf_token })
     }
 
     /// Get the info of an illust.
@@ -55,5 +58,21 @@ impl PixivClient {
             .json::<WrappedResponse<IllustInfo>>()
             .await?
             .into()
+    }
+
+    async fn csrf_token(client: &Client) -> Result<String> {
+        let resp = client
+            .get(BASE_URL_HTTPS)
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
+        let re = Regex::new(r#"token":"([^"])"#).unwrap();
+        let caps = re
+            .captures(&resp)
+            .ok_or(crate::Error::Other("No CSRF Token Found"))?;
+        let token = &caps[1];
+        Ok(token.to_string())
     }
 }

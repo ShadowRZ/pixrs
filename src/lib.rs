@@ -11,9 +11,10 @@ use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client,
 };
-use types::{IllustInfo, WrappedResponse};
+use types::WrappedResponse;
 
 pub use crate::error::Error;
+pub use crate::types::*;
 
 /// A `Result` alias where the `Err` case is `pixrs::Error`.
 pub type Result<T> = std::result::Result<T, crate::Error>;

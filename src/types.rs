@@ -141,6 +141,31 @@ pub struct UserAllWorks {
     // TODO: Novels, Manga Series, Novel Series
 }
 
+/// An image in a illust.
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct IllustImage {
+    /// The width of the (first) illust.
+    pub width: i32,
+    /// The height of the (first) illust.
+    pub height: i32,
+    /// The URLs avaliable in the image.
+    pub urls: IllustImageUrls,
+}
+
+/// The URLs avaliable in the image.
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct IllustImageUrls {
+    /// The small variant URL of the image.
+    pub small: String,
+    /// The medium variant URL of the image.
+    pub regular: String,
+    /// The original variant URL of the image.
+    pub original: String,
+    // TODO: Thumbs
+}
+
 #[allow(missing_docs)]
 #[derive(Serialize_repr, Deserialize_repr, Eq, PartialEq, Debug)]
 #[repr(u8)]

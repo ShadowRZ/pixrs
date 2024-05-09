@@ -52,18 +52,6 @@ impl PixivClient {
         Ok(PixivClient { client, csrf_token })
     }
 
-    /// Get the info of an illust.
-    pub async fn illust_info(&self, illust_id: i32) -> Result<IllustInfo> {
-        self.client
-            .get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<WrappedResponse<IllustInfo>>()
-            .await?
-            .into()
-    }
-
     /// Get the User ID of the logged in user.
     pub async fn self_user_id(&self) -> Result<Option<i32>> {
         let resp = self
@@ -111,6 +99,30 @@ impl PixivClient {
             .await?
             .error_for_status()?
             .json::<WrappedResponse<UserAllWorks>>()
+            .await?
+            .into()
+    }
+
+    /// Get the info of an illust.
+    pub async fn illust_info(&self, illust_id: i32) -> Result<IllustInfo> {
+        self.client
+            .get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<WrappedResponse<IllustInfo>>()
+            .await?
+            .into()
+    }
+
+    /// Get the info of an illust.
+    pub async fn illust_pages(&self, illust_id: i32) -> Result<Vec<IllustImage>> {
+        self.client
+            .get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<WrappedResponse<Vec<IllustImage>>>()
             .await?
             .into()
     }

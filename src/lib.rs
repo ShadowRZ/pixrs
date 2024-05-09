@@ -23,6 +23,7 @@ pub type Result<T> = std::result::Result<T, crate::Error>;
 /// The client to send Pixiv API requests.
 pub struct PixivClient {
     client: Client,
+    #[allow(dead_code)] // TODO For POST requests
     csrf_token: String,
 }
 

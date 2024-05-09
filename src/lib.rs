@@ -1,6 +1,7 @@
 //! Implments Rust API to Pixiv.
 #![warn(missing_docs)]
 #![warn(rustdoc::missing_crate_level_docs)]
+mod de;
 pub mod error;
 pub mod types;
 
@@ -76,6 +77,42 @@ impl PixivClient {
             .get("x-userid")
             .and_then(|value| value.to_str().ok())
             .and_then(|value| <i32 as FromStr>::from_str(value).ok()))
+    }
+
+    /// Get the info of an user.
+    pub async fn user_info(&self, user_id: i32) -> Result<UserInfo> {
+        self.client
+            .get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<WrappedResponse<UserInfo>>()
+            .await?
+            .into()
+    }
+
+    /// Get the top works of an user.
+    pub async fn user_top_works(&self, user_id: i32) -> Result<UserTopWorks> {
+        self.client
+            .get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<WrappedResponse<UserTopWorks>>()
+            .await?
+            .into()
+    }
+
+    /// Get all the works of an user.
+    pub async fn user_all_works(&self, user_id: i32) -> Result<UserAllWorks> {
+        self.client
+            .get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<WrappedResponse<UserAllWorks>>()
+            .await?
+            .into()
     }
 
     async fn csrf_token(client: &Client) -> Result<String> {

@@ -1,12 +1,12 @@
 //! Types for the API.
 #![warn(missing_docs)]
 
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize};
 use serde_aux::field_attributes::deserialize_number_from_string;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// Illust info.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustInfo {
@@ -35,7 +35,7 @@ pub struct IllustInfo {
 }
 
 /// Basic profile about a user.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserProfile {
@@ -65,7 +65,7 @@ pub struct UserProfile {
 }
 
 /// Full info about a user.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserInfo {
@@ -83,7 +83,7 @@ pub struct UserInfo {
 }
 
 /// A basic summary of an illust.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustProfile {
@@ -120,7 +120,7 @@ pub struct IllustProfile {
 }
 
 /// The top works of an author.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserTopWorks {
@@ -134,7 +134,7 @@ pub struct UserTopWorks {
 }
 
 /// All the works of an author.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserAllWorks {
@@ -148,7 +148,7 @@ pub struct UserAllWorks {
 }
 
 /// An image in a illust.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustImage {
@@ -161,7 +161,7 @@ pub struct IllustImage {
 }
 
 /// The URLs avaliable in the image.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustImageUrls {
@@ -175,7 +175,7 @@ pub struct IllustImageUrls {
 }
 
 #[allow(missing_docs)]
-#[derive(Serialize_repr, Deserialize_repr, Eq, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum IllustType {
@@ -185,7 +185,7 @@ pub enum IllustType {
 }
 
 #[allow(missing_docs)]
-#[derive(Serialize_repr, Deserialize_repr, Eq, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, Eq, PartialEq, Debug, Clone, Copy)]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum Restriction {
@@ -194,14 +194,35 @@ pub enum Restriction {
     R18G = 2,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
-pub(crate) struct WrappedResponse<T> {
+#[derive(Deserialize, Debug, Clone)]
+#[allow(missing_docs)]
+pub struct PixivRanking {
+    pub contents: Vec<PixivRankingItem>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[allow(missing_docs)]
+pub struct PixivRankingItem {
+    pub title: String,
+    pub tags: Vec<String>,
+    pub user_name: String,
+    pub profile_img: String,
+    pub illust_id: i32,
+    pub user_id: i32,
+    pub width: i32,
+    pub height: i32,
+    pub view_count: i32,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub(crate) struct WrappedResponse<T: DeserializeOwned> {
     pub error: bool,
     pub message: String,
+    #[serde(deserialize_with = "crate::de::deserialize_err_is_none")]
     pub body: Option<T>,
 }
 
-impl<T> From<WrappedResponse<T>> for crate::Result<T> {
+impl<T: DeserializeOwned> From<WrappedResponse<T>> for crate::Result<T> {
     fn from(val: WrappedResponse<T>) -> Self {
         if val.error {
             Result::Err(crate::Error::PixivError(val.message))

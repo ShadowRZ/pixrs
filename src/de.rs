@@ -50,3 +50,21 @@ where
 {
     Ok(T::deserialize(deserializer).ok())
 }
+
+pub(crate) fn false_is_none<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum BoolOrT<T> {
+        Bool(T),
+        T(T),
+    }
+
+    match BoolOrT::<T>::deserialize(deserializer)? {
+        BoolOrT::Bool(_) => Ok(None),
+        BoolOrT::T(val) => Ok(Some(val)),
+    }
+}

@@ -7,6 +7,8 @@ pub mod types;
 
 use std::str::FromStr;
 
+use async_stream::try_stream;
+use futures_util::Stream;
 use regex::Regex;
 use reqwest::{
     header::{HeaderMap, HeaderValue},
@@ -118,6 +120,16 @@ impl PixivClient {
         date: Option<String>,
         page: Option<i32>,
     ) -> Result<Ranking> {
+        self._ranking(mode, content, &date, page).await
+    }
+
+    async fn _ranking(
+        &self,
+        mode: RankingMode,
+        content: RankingContent,
+        date: &Option<String>,
+        page: Option<i32>,
+    ) -> Result<Ranking> {
         let mode = match mode {
             RankingMode::Daily => "&mode=daily",
             RankingMode::Weekly => "&mode=weekly",
@@ -139,7 +151,7 @@ impl PixivClient {
             RankingContent::Manga => "&content=manga",
         };
         let page = page.map(|p| format!("&p={p}")).unwrap_or_default();
-        let date = date.map(|d| format!("&date={d}")).unwrap_or_default();
+        let date = date.as_ref().map(|d| format!("&date={d}")).unwrap_or_default();
         Ok(self
             .client
             .get(format!(
@@ -150,6 +162,27 @@ impl PixivClient {
             .error_for_status()?
             .json::<Ranking>()
             .await?)
+    }
+
+    /// Get the Pixiv ranking as a series of stream.
+    pub async fn ranking_stream(
+        &self,
+        mode: RankingMode,
+        content: RankingContent,
+        date: Option<String>,
+    ) -> impl Stream<Item = Result<RankingItem>> + '_ {
+        try_stream! {
+            let first = self._ranking(mode, content, &date, None).await?;
+            for content in first.contents {
+                yield content;
+            }
+            while let Some(next) = first.next {
+                let result = self._ranking(mode, content, &date, Some(next)).await?;
+                for content in result.contents {
+                    yield content;
+                }
+            }
+        }
     }
 
     async fn csrf_token(client: &Client) -> Result<String> {

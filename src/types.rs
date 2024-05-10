@@ -199,6 +199,10 @@ pub enum Restriction {
 #[non_exhaustive]
 pub struct Ranking {
     pub contents: Vec<RankingItem>,
+    #[serde(deserialize_with = "crate::de::false_is_none")]
+    pub prev: Option<i32>,
+    #[serde(deserialize_with = "crate::de::false_is_none")]
+    pub next: Option<i32>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -218,6 +222,7 @@ pub struct RankingItem {
 
 /// The ranking mode.
 #[allow(missing_docs)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RankingMode {
     Daily,
     Weekly,
@@ -235,6 +240,7 @@ pub enum RankingMode {
 
 /// The content in ranking.
 #[allow(missing_docs)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RankingContent {
     All,
     Illust,

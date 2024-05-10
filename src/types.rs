@@ -196,12 +196,14 @@ pub enum Restriction {
 
 #[derive(Deserialize, Debug, Clone)]
 #[allow(missing_docs)]
+#[non_exhaustive]
 pub struct Ranking {
     pub contents: Vec<RankingItem>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 #[allow(missing_docs)]
+#[non_exhaustive]
 pub struct RankingItem {
     pub title: String,
     pub tags: Vec<String>,

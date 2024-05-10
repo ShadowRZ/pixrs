@@ -106,7 +106,7 @@ impl PixivClient {
             .await
     }
 
-    /// Get the info of an illust.
+    /// Get pages of an illust.
     pub async fn illust_pages(&self, illust_id: i32) -> Result<Vec<IllustImage>> {
         self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
             .await

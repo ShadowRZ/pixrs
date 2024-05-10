@@ -16,8 +16,18 @@ thiserror = "1"
 regex = "1"
 futures-util = "0.3"
 async-stream = "0.3"
-reqwest = { version = "0.12", features = ["json"] }
+
+[dependencies.reqwest]
+version = "0.12"
+default-features = false
+features = ["charset", "json"]
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 anyhow = "1"
+reqwest = "0.12"
+
+[features]
+default = ["native-tls"]
+native-tls = ["reqwest/native-tls"]
+rustls-tls = ["reqwest/rustls-tls"]

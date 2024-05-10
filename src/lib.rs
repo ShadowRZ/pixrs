@@ -117,7 +117,7 @@ impl PixivClient {
         content: RankingContent,
         date: Option<String>,
         page: Option<i32>,
-    ) -> Result<PixivRanking> {
+    ) -> Result<Ranking> {
         let mode = match mode {
             RankingMode::Daily => "&mode=daily",
             RankingMode::Weekly => "&mode=weekly",
@@ -148,7 +148,7 @@ impl PixivClient {
             .send()
             .await?
             .error_for_status()?
-            .json::<PixivRanking>()
+            .json::<Ranking>()
             .await?)
     }
 

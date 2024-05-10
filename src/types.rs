@@ -8,6 +8,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 /// Illust info.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct IllustInfo {
     /// The ID of the illust.
     #[serde(deserialize_with = "deserialize_number_from_string")]
@@ -36,6 +37,7 @@ pub struct IllustInfo {
 /// Basic profile about a user.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct UserProfile {
     /// The User ID of the user.
     #[serde(deserialize_with = "deserialize_number_from_string")]
@@ -65,6 +67,7 @@ pub struct UserProfile {
 /// Full info about a user.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct UserInfo {
     /// The base profile of the user.
     #[serde(flatten)]
@@ -82,6 +85,7 @@ pub struct UserInfo {
 /// A basic summary of an illust.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct IllustProfile {
     /// The ID of the illust.
     #[serde(deserialize_with = "deserialize_number_from_string")]
@@ -118,6 +122,7 @@ pub struct IllustProfile {
 /// The top works of an author.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct UserTopWorks {
     /// The top illusts.
     #[serde(deserialize_with = "crate::de::dict_value_to_vec")]
@@ -131,6 +136,7 @@ pub struct UserTopWorks {
 /// All the works of an author.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct UserAllWorks {
     /// The top illusts.
     #[serde(deserialize_with = "crate::de::dict_key_to_vec")]
@@ -144,6 +150,7 @@ pub struct UserAllWorks {
 /// An image in a illust.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct IllustImage {
     /// The width of the (first) illust.
     pub width: i32,
@@ -156,6 +163,7 @@ pub struct IllustImage {
 /// The URLs avaliable in the image.
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub struct IllustImageUrls {
     /// The small variant URL of the image.
     pub small: String,
@@ -169,6 +177,7 @@ pub struct IllustImageUrls {
 #[allow(missing_docs)]
 #[derive(Serialize_repr, Deserialize_repr, Eq, PartialEq, Debug)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum IllustType {
     Illustration = 0,
     Manga = 1,
@@ -178,6 +187,7 @@ pub enum IllustType {
 #[allow(missing_docs)]
 #[derive(Serialize_repr, Deserialize_repr, Eq, PartialEq, Debug)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum Restriction {
     General = 0,
     R18 = 1,

@@ -12,6 +12,7 @@ use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client,
 };
+use serde::de::DeserializeOwned;
 use types::WrappedResponse;
 
 pub use crate::error::Error;
@@ -53,6 +54,17 @@ impl PixivClient {
         Ok(PixivClient { client, csrf_token })
     }
 
+    async fn _common_get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> Result<T> {
+        self.client
+            .get(url)
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<WrappedResponse<T>>()
+            .await?
+            .into()
+    }
+
     /// Get the User ID of the logged in user.
     pub async fn self_user_id(&self) -> Result<Option<i32>> {
         let resp = self
@@ -70,62 +82,27 @@ impl PixivClient {
 
     /// Get the info of an user.
     pub async fn user_info(&self, user_id: i32) -> Result<UserInfo> {
-        self.client
-            .get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<WrappedResponse<UserInfo>>()
-            .await?
-            .into()
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1")).await
     }
 
     /// Get the top works of an user.
     pub async fn user_top_works(&self, user_id: i32) -> Result<UserTopWorks> {
-        self.client
-            .get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<WrappedResponse<UserTopWorks>>()
-            .await?
-            .into()
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top")).await
     }
 
     /// Get all the works of an user.
     pub async fn user_all_works(&self, user_id: i32) -> Result<UserAllWorks> {
-        self.client
-            .get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<WrappedResponse<UserAllWorks>>()
-            .await?
-            .into()
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all")).await
     }
 
     /// Get the info of an illust.
     pub async fn illust_info(&self, illust_id: i32) -> Result<IllustInfo> {
-        self.client
-            .get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<WrappedResponse<IllustInfo>>()
-            .await?
-            .into()
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}")).await
     }
 
     /// Get the info of an illust.
     pub async fn illust_pages(&self, illust_id: i32) -> Result<Vec<IllustImage>> {
-        self.client
-            .get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<WrappedResponse<Vec<IllustImage>>>()
-            .await?
-            .into()
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages")).await
     }
 
     async fn csrf_token(client: &Client) -> Result<String> {

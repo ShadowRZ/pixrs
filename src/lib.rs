@@ -82,27 +82,74 @@ impl PixivClient {
 
     /// Get the info of an user.
     pub async fn user_info(&self, user_id: i32) -> Result<UserInfo> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1")).await
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
+            .await
     }
 
     /// Get the top works of an user.
     pub async fn user_top_works(&self, user_id: i32) -> Result<UserTopWorks> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top")).await
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
+            .await
     }
 
     /// Get all the works of an user.
     pub async fn user_all_works(&self, user_id: i32) -> Result<UserAllWorks> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all")).await
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
+            .await
     }
 
     /// Get the info of an illust.
     pub async fn illust_info(&self, illust_id: i32) -> Result<IllustInfo> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}")).await
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
+            .await
     }
 
     /// Get the info of an illust.
     pub async fn illust_pages(&self, illust_id: i32) -> Result<Vec<IllustImage>> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages")).await
+        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
+            .await
+    }
+
+    /// Get the Pixiv ranking.
+    pub async fn ranking(
+        &self,
+        mode: RankingMode,
+        content: RankingContent,
+        date: Option<String>,
+        page: Option<i32>,
+    ) -> Result<PixivRanking> {
+        let mode = match mode {
+            RankingMode::Daily => "&mode=daily",
+            RankingMode::Weekly => "&mode=weekly",
+            RankingMode::Monthly => "&mode=monthly",
+            RankingMode::Rookie => "&mode=rookie",
+            RankingMode::Original => "&mode=original",
+            RankingMode::Male => "&mode=male",
+            RankingMode::Female => "&mode=female",
+            RankingMode::DailyR18 => "&mode=daily_r18",
+            RankingMode::WeeklyR18 => "&mode=weekly_r18",
+            RankingMode::MaleR18 => "&mode=male_r18",
+            RankingMode::FemaleR18 => "&mode=female_r18",
+            RankingMode::R18G => "&mode=r18g",
+        };
+        let content = match content {
+            RankingContent::All => "",
+            RankingContent::Illust => "&content=illust",
+            RankingContent::Ugoira => "&content=ugoira",
+            RankingContent::Manga => "&content=manga",
+        };
+        let page = page.map(|p| format!("&p={p}")).unwrap_or_default();
+        let date = date.map(|d| format!("&date={d}")).unwrap_or_default();
+        Ok(self
+            .client
+            .get(format!(
+                "{BASE_URL_HTTPS}/ranking.php?format=json{mode}{content}{page}{date}",
+            ))
+            .send()
+            .await?
+            .error_for_status()?
+            .json::<PixivRanking>()
+            .await?)
     }
 
     async fn csrf_token(client: &Client) -> Result<String> {

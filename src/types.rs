@@ -82,6 +82,7 @@ pub struct UserInfo {
     pub official: bool,
 }
 
+// TODO: Date / Time
 /// A basic summary of an illust.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -115,8 +116,7 @@ pub struct IllustProfile {
     /// The pages avaliable in the illust.
     pub page_count: i32,
     /// The profile image URL of the author.
-    pub profile_image_url: String
-    // TODO: Date / Time
+    pub profile_image_url: String,
 }
 
 /// The top works of an author.
@@ -212,6 +212,32 @@ pub struct PixivRankingItem {
     pub width: i32,
     pub height: i32,
     pub view_count: i32,
+}
+
+/// The ranking mode.
+#[allow(missing_docs)]
+pub enum RankingMode {
+    Daily,
+    Weekly,
+    Monthly,
+    Rookie,
+    Original,
+    Male,
+    Female,
+    DailyR18,
+    WeeklyR18,
+    MaleR18,
+    FemaleR18,
+    R18G,
+}
+
+/// The content in ranking.
+#[allow(missing_docs)]
+pub enum RankingContent {
+    All,
+    Illust,
+    Ugoira,
+    Manga,
 }
 
 #[derive(Deserialize, Debug, Clone)]

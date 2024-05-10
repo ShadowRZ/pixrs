@@ -1,9 +1,6 @@
 //! Deserialize functions.
 
-use std::{
-    collections::HashMap,
-    hash::Hash,
-};
+use std::{collections::HashMap, hash::Hash};
 
 use serde::{Deserialize, Deserializer};
 
@@ -49,7 +46,7 @@ where
 pub(crate) fn deserialize_err_is_none<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
 where
     D: Deserializer<'de>,
-    T: Deserialize<'de>
+    T: Deserialize<'de>,
 {
     Ok(T::deserialize(deserializer).ok())
 }

@@ -59,7 +59,7 @@ where
     #[derive(Deserialize)]
     #[serde(untagged)]
     enum BoolOrT<T> {
-        Bool(T),
+        Bool(bool),
         T(T),
     }
 

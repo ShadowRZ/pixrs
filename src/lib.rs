@@ -26,8 +26,6 @@ pub type Result<T> = std::result::Result<T, crate::Error>;
 /// The client to send Pixiv API requests.
 pub struct PixivClient {
     client: Client,
-    #[allow(dead_code)] // TODO For POST requests
-    csrf_token: String,
 }
 
 static BASE_URL_HTTPS: &str = "https://www.pixiv.net";
@@ -52,8 +50,7 @@ impl PixivClient {
             .user_agent(USER_AGENT)
             .default_headers(headers)
             .build()?;
-        let csrf_token = PixivClient::csrf_token(&client).await?;
-        Ok(PixivClient { client, csrf_token })
+        Ok(PixivClient { client })
     }
 
     async fn _common_get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> Result<T> {
@@ -185,6 +182,7 @@ impl PixivClient {
         }
     }
 
+    #[allow(dead_code)]
     async fn csrf_token(client: &Client) -> Result<String> {
         let resp = client
             .get(BASE_URL_HTTPS)

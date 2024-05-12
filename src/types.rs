@@ -22,15 +22,38 @@ pub struct IllustInfo {
     /// The restriction type for the illust.
     #[serde(rename = "xRestrict")]
     pub restriction: Restriction,
+    /// The URLs avaliable in the (first) image of the illust.
+    pub urls: IllustImageUrls,
     /// The User ID of the author.
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub user_id: i32,
     /// The name of the author.
     pub user_name: String,
+    /// All illust IDs by the same author.
+    #[serde(deserialize_with = "crate::de::dict_key_to_vec")]
+    pub user_illusts: Vec<i32>,
+    /// Whether the account holder has liked the illust.
+    #[serde(rename = "likeData")]
+    pub liked: bool,
     /// The width of the (first) illust.
     pub width: i32,
     /// The height of the (first) illust.
     pub height: i32,
+    /// How many pages the illust have.
+    pub page_count: i32,
+    /// How many bookmarks the illust have.
+    pub bookmark_count: i32,
+    /// How many likes the illust have.
+    pub like_count: i32,
+    /// How many comments the illust have.
+    pub comment_count: i32,
+    #[allow(missing_docs)]
+    pub response_count: i32,
+    /// How many views the illust have.
+    pub view_count: i32,
+    /// Whether this illust is original work.
+    #[serde(rename = "isOriginal")]
+    pub original: bool,
     // TODO: Date / Time
 }
 
@@ -119,15 +142,15 @@ pub struct IllustProfile {
     pub profile_image_url: String,
 }
 
-/// The top works of an author.
+/// The recent works of an author.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserTopWorks {
-    /// The top illusts.
+    /// Recent illusts.
     #[serde(deserialize_with = "crate::de::dict_value_to_vec")]
     pub illusts: Vec<IllustProfile>,
-    /// The top illusts.
+    /// Recent mangas.
     #[serde(rename = "manga", deserialize_with = "crate::de::dict_value_to_vec")]
     pub mangas: Vec<IllustProfile>,
     // TODO: Novels
@@ -138,10 +161,10 @@ pub struct UserTopWorks {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserAllWorks {
-    /// The top illusts.
+    /// All illust IDs by the author.
     #[serde(deserialize_with = "crate::de::dict_key_to_vec")]
     pub illusts: Vec<i32>,
-    /// The top illusts.
+    /// All manga IDs by the author.
     #[serde(rename = "manga", deserialize_with = "crate::de::dict_key_to_vec")]
     pub mangas: Vec<i32>,
     // TODO: Novels, Manga Series, Novel Series

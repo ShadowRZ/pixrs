@@ -29,6 +29,8 @@ pub struct IllustInfo {
     pub restriction: Restriction,
     /// The URLs avaliable in the (first) image of the illust.
     pub urls: IllustImageUrls,
+    /// The tags infomation of the illust.
+    pub tags: IllustTagsInfo,
     /// The User ID of the author.
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub user_id: i32,
@@ -199,6 +201,40 @@ pub struct IllustImageUrls {
     /// The original variant URL of the image.
     pub original: String,
     // TODO: Thumbs
+}
+
+/// Illust tag base info.
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct IllustTagsInfo {
+    /// The illust author ID.
+    #[serde(deserialize_with = "deserialize_number_from_string")]
+    pub author_id: i32,
+    /// Whether the tags has been locked.
+    pub is_locked: bool,
+    /// Avaliable tags.
+    pub tags: Vec<IllustTag>,
+    /// Whether tags can be added.
+    pub writable: bool,
+}
+
+/// A tag of an illust.
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct IllustTag {
+    /// The untranslated tag.
+    pub tag: String,
+    /// Whether this tag has been locked.
+    pub locked: bool,
+    /// Whether this tag can be deleted.
+    pub deletable: bool,
+    /// The user ID of the tagger.
+    #[serde(deserialize_with = "deserialize_number_from_string")]
+    pub user_id: i32,
+    /// The user name of the tagger.
+    pub user_name: String,
 }
 
 #[allow(missing_docs)]

@@ -59,6 +59,7 @@ where
     #[derive(Deserialize)]
     #[serde(untagged)]
     enum BoolOrT<T> {
+        #[allow(dead_code)]
         Bool(bool),
         T(T),
     }

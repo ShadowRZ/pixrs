@@ -9,7 +9,7 @@ pub enum Error {
     #[error("Pixiv API Error: {0}")]
     PixivError(String),
     /// HTTP error.
-    #[error("HTTP Error: {0}")]
+    #[error("HTTP Error")]
     HttpError(#[from] reqwest::Error),
     /// Other error.
     #[error("{0}")]

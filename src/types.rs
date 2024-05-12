@@ -4,6 +4,7 @@
 use serde::{de::DeserializeOwned, Deserialize};
 use serde_aux::field_attributes::deserialize_number_from_string;
 use serde_repr::{Deserialize_repr, Serialize_repr};
+use time::OffsetDateTime;
 
 /// Illust info.
 #[derive(Deserialize, Debug, Clone)]
@@ -19,6 +20,10 @@ pub struct IllustInfo {
     pub description: String,
     /// The type of the illust.
     pub illust_type: IllustType,
+    /// The date the illust is created.
+    pub create_date: OffsetDateTime,
+    /// The date the illust is uploaded.
+    pub upload_date: OffsetDateTime,
     /// The restriction type for the illust.
     #[serde(rename = "xRestrict")]
     pub restriction: Restriction,
@@ -54,7 +59,6 @@ pub struct IllustInfo {
     /// Whether this illust is original work.
     #[serde(rename = "isOriginal")]
     pub original: bool,
-    // TODO: Date / Time
 }
 
 /// Basic profile about a user.

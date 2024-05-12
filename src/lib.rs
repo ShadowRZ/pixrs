@@ -1,4 +1,8 @@
 //! Implments Rust API to Pixiv.
+//!
+//! ## Features
+//!
+//! * `rustls-tls`: Enables the `rustls-tls` feature of reqwest.
 #![warn(missing_docs)]
 #![warn(rustdoc::missing_crate_level_docs)]
 mod de;
@@ -148,7 +152,10 @@ impl PixivClient {
             RankingContent::Manga => "&content=manga",
         };
         let page = page.map(|p| format!("&p={p}")).unwrap_or_default();
-        let date = date.as_ref().map(|d| format!("&date={d}")).unwrap_or_default();
+        let date = date
+            .as_ref()
+            .map(|d| format!("&date={d}"))
+            .unwrap_or_default();
         Ok(self
             .client
             .get(format!(

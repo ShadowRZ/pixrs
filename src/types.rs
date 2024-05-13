@@ -238,10 +238,12 @@ pub struct IllustTag {
     /// Whether this tag can be deleted.
     pub deletable: bool,
     /// The user ID of the tagger.
-    #[serde_as(as = "DisplayFromStr")]
-    pub user_id: i32,
+    #[serde_as(as = "Option<DisplayFromStr>")]
+    #[serde(default)]
+    pub user_id: Option<i32>,
     /// The user name of the tagger.
-    pub user_name: String,
+    #[serde(default)]
+    pub user_name: Option<String>,
 }
 
 #[allow(missing_docs)]

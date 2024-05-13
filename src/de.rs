@@ -1,6 +1,6 @@
 //! Deserialize functions.
 
-use std::{collections::HashMap, hash::Hash};
+use std::{collections::HashMap, fmt::Display, hash::Hash, str::FromStr};
 
 use serde::{Deserialize, Deserializer};
 
@@ -25,21 +25,30 @@ where
 pub(crate) fn dict_key_to_vec<'de, T, D>(deserializer: D) -> Result<Vec<T>, D::Error>
 where
     D: Deserializer<'de>,
-    T: Eq + Hash + Deserialize<'de>,
+    T: Eq + Hash + FromStr + Deserialize<'de>,
+    <T as FromStr>::Err: Display,
 {
+    use serde::de::IgnoredAny;
     #[derive(Deserialize)]
     #[serde(untagged)]
-    enum HashMapOrVec<T>
-    where
-        T: Eq + Hash,
-    {
-        HashMap(HashMap<T, ()>),
-        Vec(Vec<T>),
+    enum HashMapOrVec {
+        HashMap(HashMap<String, IgnoredAny>),
+        Vec(Vec<String>),
     }
 
-    match HashMapOrVec::<T>::deserialize(deserializer)? {
-        HashMapOrVec::HashMap(map) => Ok(map.into_keys().collect()),
-        HashMapOrVec::Vec(set) => Ok(set),
+    match HashMapOrVec::deserialize(deserializer)? {
+        HashMapOrVec::HashMap(map) => {
+            let keys = map.into_keys();
+            let res: Result<Vec<T>, <T as FromStr>::Err> =
+                keys.map(|key| <T as FromStr>::from_str(&key)).collect();
+            res.map_err(serde::de::Error::custom)
+        }
+        HashMapOrVec::Vec(set) => {
+            let keys = set.into_iter();
+            let res: Result<Vec<T>, <T as FromStr>::Err> =
+                keys.map(|key| <T as FromStr>::from_str(&key)).collect();
+            res.map_err(serde::de::Error::custom)
+        }
     }
 }
 
@@ -68,4 +77,18 @@ where
         BoolOrT::Bool(_) => Ok(None),
         BoolOrT::T(val) => Ok(Some(val)),
     }
+}
+
+pub(crate) fn deserialize_iso8601_datetime<'de, D>(
+    deserializer: D,
+) -> Result<time::OffsetDateTime, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    use time::format_description::well_known::Iso8601;
+    use time::OffsetDateTime;
+
+    let s = String::deserialize(deserializer)?;
+    let dt = OffsetDateTime::parse(&s, &Iso8601::DEFAULT).map_err(serde::de::Error::custom)?;
+    Ok(dt)
 }

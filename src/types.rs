@@ -2,17 +2,18 @@
 #![warn(missing_docs)]
 
 use serde::{de::DeserializeOwned, Deserialize};
-use serde_aux::field_attributes::deserialize_number_from_string;
 use serde_repr::{Deserialize_repr, Serialize_repr};
+use serde_with::{serde_as, DisplayFromStr};
 use time::OffsetDateTime;
 
 /// Illust info.
+#[serde_as]
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustInfo {
     /// The ID of the illust.
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde_as(as = "DisplayFromStr")]
     pub id: i32,
     /// The title of the illust.
     pub title: String,
@@ -21,8 +22,10 @@ pub struct IllustInfo {
     /// The type of the illust.
     pub illust_type: IllustType,
     /// The date the illust is created.
+    #[serde(deserialize_with = "crate::de::deserialize_iso8601_datetime")]
     pub create_date: OffsetDateTime,
     /// The date the illust is uploaded.
+    #[serde(deserialize_with = "crate::de::deserialize_iso8601_datetime")]
     pub upload_date: OffsetDateTime,
     /// The restriction type for the illust.
     #[serde(rename = "xRestrict")]
@@ -32,7 +35,7 @@ pub struct IllustInfo {
     /// The tags infomation of the illust.
     pub tags: IllustTagsInfo,
     /// The User ID of the author.
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde_as(as = "DisplayFromStr")]
     pub user_id: i32,
     /// The name of the author.
     pub user_name: String,
@@ -64,12 +67,13 @@ pub struct IllustInfo {
 }
 
 /// Basic profile about a user.
+#[serde_as]
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserProfile {
     /// The User ID of the user.
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde_as(as = "DisplayFromStr")]
     pub user_id: i32,
     /// The name of the user.
     pub name: String,
@@ -113,12 +117,13 @@ pub struct UserInfo {
 
 // TODO: Date / Time
 /// A basic summary of an illust.
+#[serde_as]
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustProfile {
     /// The ID of the illust.
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde_as(as = "DisplayFromStr")]
     pub id: i32,
     /// The title of the illust.
     pub title: String,
@@ -134,7 +139,7 @@ pub struct IllustProfile {
     /// The untranslated tags of the illust.
     pub tags: Vec<String>,
     /// The User ID of the author.
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde_as(as = "DisplayFromStr")]
     pub user_id: i32,
     /// The name of the author.
     pub user_name: String,
@@ -204,12 +209,13 @@ pub struct IllustImageUrls {
 }
 
 /// Illust tag base info.
+#[serde_as]
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustTagsInfo {
     /// The illust author ID.
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde_as(as = "DisplayFromStr")]
     pub author_id: i32,
     /// Whether the tags has been locked.
     pub is_locked: bool,
@@ -220,6 +226,7 @@ pub struct IllustTagsInfo {
 }
 
 /// A tag of an illust.
+#[serde_as]
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
@@ -231,7 +238,7 @@ pub struct IllustTag {
     /// Whether this tag can be deleted.
     pub deletable: bool,
     /// The user ID of the tagger.
-    #[serde(deserialize_with = "deserialize_number_from_string")]
+    #[serde_as(as = "DisplayFromStr")]
     pub user_id: i32,
     /// The user name of the tagger.
     pub user_name: String,

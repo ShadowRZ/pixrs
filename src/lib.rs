@@ -29,7 +29,7 @@ pub type Result<T> = std::result::Result<T, crate::Error>;
 
 /// The client to send Pixiv API requests.
 pub struct PixivClient {
-    client: Client,
+    pub client: Client,
 }
 
 static BASE_URL_HTTPS: &str = "https://www.pixiv.net";
@@ -57,7 +57,7 @@ impl PixivClient {
         Ok(PixivClient { client })
     }
 
-    async fn _common_get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> Result<T> {
+    pub async fn common_get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> Result<T> {
         self.client
             .get(url)
             .send()
@@ -85,31 +85,31 @@ impl PixivClient {
 
     /// Get the info of an user.
     pub async fn user_info(&self, user_id: i32) -> Result<UserInfo> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
+        self.common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
             .await
     }
 
     /// Get the top works of an user.
     pub async fn user_top_works(&self, user_id: i32) -> Result<UserTopWorks> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
+        self.common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
             .await
     }
 
     /// Get all the works of an user.
     pub async fn user_all_works(&self, user_id: i32) -> Result<UserAllWorks> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
+        self.common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
             .await
     }
 
     /// Get the info of an illust.
     pub async fn illust_info(&self, illust_id: i32) -> Result<IllustInfo> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
+        self.common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
             .await
     }
 
     /// Get pages of an illust.
     pub async fn illust_pages(&self, illust_id: i32) -> Result<Vec<IllustImage>> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
+        self.common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
             .await
     }
 

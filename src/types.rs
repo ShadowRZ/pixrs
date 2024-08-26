@@ -321,7 +321,7 @@ pub enum RankingContent {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub(crate) struct WrappedResponse<T: DeserializeOwned> {
+pub struct WrappedResponse<T: DeserializeOwned> {
     pub error: bool,
     pub message: String,
     #[serde(deserialize_with = "crate::de::deserialize_err_is_none")]

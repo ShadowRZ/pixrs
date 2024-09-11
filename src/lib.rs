@@ -57,7 +57,8 @@ impl PixivClient {
         Ok(PixivClient { client })
     }
 
-    async fn _common_get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> Result<T> {
+    /// Performs a GET request with Pixiv Web credentials.
+    pub async fn get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> Result<T> {
         self.client
             .get(url)
             .send()
@@ -85,31 +86,31 @@ impl PixivClient {
 
     /// Get the info of an user.
     pub async fn user_info(&self, user_id: i32) -> Result<UserInfo> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
+        self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
             .await
     }
 
     /// Get the top works of an user.
     pub async fn user_top_works(&self, user_id: i32) -> Result<UserTopWorks> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
+        self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
             .await
     }
 
     /// Get all the works of an user.
     pub async fn user_all_works(&self, user_id: i32) -> Result<UserAllWorks> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
+        self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
             .await
     }
 
     /// Get the info of an illust.
     pub async fn illust_info(&self, illust_id: i32) -> Result<IllustInfo> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
+        self.get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
             .await
     }
 
     /// Get pages of an illust.
     pub async fn illust_pages(&self, illust_id: i32) -> Result<Vec<IllustImage>> {
-        self._common_get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
+        self.get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
             .await
     }
 
@@ -187,6 +188,11 @@ impl PixivClient {
                 }
             }
         }
+    }
+
+    /// Returns the client instance.
+    pub fn client(&self) -> &reqwest::Client {
+        &self.client
     }
 
     #[allow(dead_code)]

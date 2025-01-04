@@ -22,10 +22,10 @@ pub struct IllustInfo {
     /// The type of the illust.
     pub illust_type: IllustType,
     /// The date the illust is created.
-    #[serde(deserialize_with = "crate::de::deserialize_iso8601_datetime")]
+    #[serde(with = "time::serde::iso8601")]
     pub create_date: OffsetDateTime,
     /// The date the illust is uploaded.
-    #[serde(deserialize_with = "crate::de::deserialize_iso8601_datetime")]
+    #[serde(with = "time::serde::iso8601")]
     pub upload_date: OffsetDateTime,
     /// The restriction type for the illust.
     #[serde(rename = "xRestrict")]

@@ -78,17 +78,3 @@ where
         BoolOrT::T(val) => Ok(Some(val)),
     }
 }
-
-pub(crate) fn deserialize_iso8601_datetime<'de, D>(
-    deserializer: D,
-) -> Result<time::OffsetDateTime, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    use time::format_description::well_known::Iso8601;
-    use time::OffsetDateTime;
-
-    let s = String::deserialize(deserializer)?;
-    let dt = OffsetDateTime::parse(&s, &Iso8601::DEFAULT).map_err(serde::de::Error::custom)?;
-    Ok(dt)
-}

@@ -7,11 +7,13 @@
 #![warn(rustdoc::missing_crate_level_docs)]
 mod de;
 pub mod error;
+pub mod futures;
 pub mod types;
 
 use std::str::FromStr;
 
 use async_stream::try_stream;
+use futures::GetRequest;
 use futures_util::Stream;
 use regex::Regex;
 use reqwest::{
@@ -19,7 +21,7 @@ use reqwest::{
     Client,
 };
 use serde::de::DeserializeOwned;
-use types::WrappedResponse;
+use std::marker::PhantomData;
 
 pub use crate::error::Error;
 pub use crate::types::*;
@@ -58,15 +60,13 @@ impl PixivClient {
     }
 
     /// Performs a GET request with Pixiv Web credentials.
-    pub async fn get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> Result<T> {
-        self.client
-            .get(url)
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<WrappedResponse<T>>()
-            .await?
-            .into()
+    pub fn get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> GetRequest<T> {
+        let url = url.into_url();
+        GetRequest {
+            client: &self.client,
+            url,
+            _type: PhantomData,
+        }
     }
 
     /// Get the User ID of the logged in user.
@@ -85,33 +85,28 @@ impl PixivClient {
     }
 
     /// Get the info of an user.
-    pub async fn user_info(&self, user_id: i32) -> Result<UserInfo> {
+    pub fn user_info(&self, user_id: i32) -> GetRequest<UserInfo> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
-            .await
     }
 
     /// Get the top works of an user.
-    pub async fn user_top_works(&self, user_id: i32) -> Result<UserTopWorks> {
+    pub fn user_top_works(&self, user_id: i32) -> GetRequest<UserTopWorks> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
-            .await
     }
 
     /// Get all the works of an user.
-    pub async fn user_all_works(&self, user_id: i32) -> Result<UserAllWorks> {
+    pub fn user_all_works(&self, user_id: i32) -> GetRequest<UserAllWorks> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
-            .await
     }
 
     /// Get the info of an illust.
-    pub async fn illust_info(&self, illust_id: i32) -> Result<IllustInfo> {
+    pub fn illust_info(&self, illust_id: i32) -> GetRequest<IllustInfo> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
-            .await
     }
 
     /// Get pages of an illust.
-    pub async fn illust_pages(&self, illust_id: i32) -> Result<Vec<IllustImage>> {
+    pub fn illust_pages(&self, illust_id: i32) -> GetRequest<Vec<IllustImage>> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
-            .await
     }
 
     /// Get the Pixiv ranking.

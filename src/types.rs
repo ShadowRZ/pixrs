@@ -4,6 +4,7 @@
 use serde::{de::DeserializeOwned, Deserialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use serde_with::{serde_as, DisplayFromStr};
+use std::collections::HashMap;
 use time::OffsetDateTime;
 
 /// Illust info.
@@ -244,6 +245,9 @@ pub struct IllustTag {
     /// The user name of the tagger.
     #[serde(default)]
     pub user_name: Option<String>,
+    /// Translations of the tag.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    pub translation: HashMap<String, String>,
 }
 
 #[allow(missing_docs)]

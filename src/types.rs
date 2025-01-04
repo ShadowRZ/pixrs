@@ -1,7 +1,7 @@
 //! Types for the API.
 #![warn(missing_docs)]
 
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use serde_with::{serde_as, DisplayFromStr};
 use std::collections::HashMap;
@@ -9,7 +9,7 @@ use time::OffsetDateTime;
 
 /// Illust info.
 #[serde_as]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustInfo {
@@ -69,7 +69,7 @@ pub struct IllustInfo {
 
 /// Basic profile about a user.
 #[serde_as]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserProfile {
@@ -99,7 +99,7 @@ pub struct UserProfile {
 }
 
 /// Full info about a user.
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserInfo {
@@ -119,7 +119,7 @@ pub struct UserInfo {
 // TODO: Date / Time
 /// A basic summary of an illust.
 #[serde_as]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustProfile {
@@ -155,7 +155,7 @@ pub struct IllustProfile {
 }
 
 /// The recent works of an author.
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserTopWorks {
@@ -169,7 +169,7 @@ pub struct UserTopWorks {
 }
 
 /// All the works of an author.
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct UserAllWorks {
@@ -183,7 +183,7 @@ pub struct UserAllWorks {
 }
 
 /// An image in a illust.
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustImage {
@@ -196,7 +196,7 @@ pub struct IllustImage {
 }
 
 /// The URLs avaliable in the image.
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustImageUrls {
@@ -211,7 +211,7 @@ pub struct IllustImageUrls {
 
 /// Illust tag base info.
 #[serde_as]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustTagsInfo {
@@ -228,7 +228,7 @@ pub struct IllustTagsInfo {
 
 /// A tag of an illust.
 #[serde_as]
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct IllustTag {
@@ -270,7 +270,7 @@ pub enum Restriction {
     R18G = 2,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[allow(missing_docs)]
 #[non_exhaustive]
 pub struct Ranking {
@@ -281,7 +281,7 @@ pub struct Ranking {
     pub next: Option<i32>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[allow(missing_docs)]
 #[non_exhaustive]
 pub struct RankingItem {
@@ -324,7 +324,7 @@ pub enum RankingContent {
     Manga,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub(crate) struct WrappedResponse<T: DeserializeOwned> {
     pub error: bool,
     pub message: String,

@@ -11,15 +11,13 @@ pub mod futures;
 pub mod types;
 
 use std::str::FromStr;
+use std::sync::LazyLock;
 
 use async_stream::try_stream;
 use futures::GetRequest;
 use futures_util::Stream;
 use regex::Regex;
-use reqwest::{
-    header::{HeaderMap, HeaderValue},
-    Client,
-};
+use reqwest::{header::HeaderValue, Client};
 use serde::de::DeserializeOwned;
 use std::marker::PhantomData;
 
@@ -32,10 +30,16 @@ pub type Result<T> = std::result::Result<T, crate::Error>;
 /// The client to send Pixiv API requests.
 pub struct PixivClient {
     client: Client,
+    cookie: HeaderValue,
 }
 
 static BASE_URL_HTTPS: &str = "https://www.pixiv.net";
 static USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36";
+
+pub(crate) static USER_AGENT_HEADER_VALUE: LazyLock<HeaderValue> =
+    LazyLock::new(|| HeaderValue::from_static(USER_AGENT));
+pub(crate) static REFERER_HEADER_VALUE: LazyLock<HeaderValue> =
+    LazyLock::new(|| HeaderValue::from_static(BASE_URL_HTTPS));
 
 impl PixivClient {
     /// Creates a new client.
@@ -43,20 +47,23 @@ impl PixivClient {
     /// * `token`: The session token on your web session. See the [PixivFE guide](https://pixivfe.pages.dev/obtaining-pixivfe-token/) for how to get it.
     pub async fn new(token: &str) -> Result<Self> {
         let cookie = format!("PHPSESSID={token}");
-        let mut headers = HeaderMap::new();
         let mut cookie = HeaderValue::from_str(&cookie)
             .map_err(|_| crate::Error::Other("Cookies data seems to be invaild"))?;
         cookie.set_sensitive(true);
-        headers.append(reqwest::header::COOKIE, cookie);
-        headers.append(
-            reqwest::header::REFERER,
-            HeaderValue::from_static(BASE_URL_HTTPS),
-        );
-        let client = Client::builder()
-            .user_agent(USER_AGENT)
-            .default_headers(headers)
-            .build()?;
-        Ok(PixivClient { client })
+        let client = Client::new();
+        Ok(PixivClient { client, cookie })
+    }
+
+    /// Creates a new client using an existing [reqwest::Client].
+    /// ## Argument
+    /// * `token`: The session token on your web session. See the [PixivFE guide](https://pixivfe.pages.dev/obtaining-pixivfe-token/) for how to get it.
+    pub async fn from_client(token: &str, client: &reqwest::Client) -> Result<Self> {
+        let cookie = format!("PHPSESSID={token}");
+        let mut cookie = HeaderValue::from_str(&cookie)
+            .map_err(|_| crate::Error::Other("Cookies data seems to be invaild"))?;
+        cookie.set_sensitive(true);
+        let client = client.clone();
+        Ok(PixivClient { client, cookie })
     }
 
     /// Performs a GET request with Pixiv Web credentials.
@@ -64,6 +71,7 @@ impl PixivClient {
         let url = url.into_url();
         GetRequest {
             client: &self.client,
+            cookie: self.cookie.clone(),
             url,
             _type: PhantomData,
         }
@@ -74,6 +82,9 @@ impl PixivClient {
         let resp = self
             .client
             .get(BASE_URL_HTTPS)
+            .header(reqwest::header::COOKIE, self.cookie.clone())
+            .header(reqwest::header::REFERER, REFERER_HEADER_VALUE.clone())
+            .header(reqwest::header::USER_AGENT, USER_AGENT_HEADER_VALUE.clone())
             .send()
             .await?
             .error_for_status()?;
@@ -157,6 +168,9 @@ impl PixivClient {
             .get(format!(
                 "{BASE_URL_HTTPS}/ranking.php?format=json{mode}{content}{page}{date}",
             ))
+            .header(reqwest::header::COOKIE, self.cookie.clone())
+            .header(reqwest::header::REFERER, REFERER_HEADER_VALUE.clone())
+            .header(reqwest::header::USER_AGENT, USER_AGENT_HEADER_VALUE.clone())
             .send()
             .await?
             .error_for_status()?

@@ -67,7 +67,7 @@ impl PixivClient {
     }
 
     /// Performs a GET request with Pixiv Web credentials.
-    pub fn get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> GetRequest<T> {
+    pub fn get<T: DeserializeOwned>(&self, url: impl reqwest::IntoUrl) -> GetRequest<'_, T> {
         let url = url.into_url();
         GetRequest {
             client: &self.client,
@@ -96,27 +96,27 @@ impl PixivClient {
     }
 
     /// Get the info of an user.
-    pub fn user_info(&self, user_id: i32) -> GetRequest<UserInfo> {
+    pub fn user_info(&self, user_id: i32) -> GetRequest<'_, UserInfo> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}?full=1"))
     }
 
     /// Get the top works of an user.
-    pub fn user_top_works(&self, user_id: i32) -> GetRequest<UserTopWorks> {
+    pub fn user_top_works(&self, user_id: i32) -> GetRequest<'_, UserTopWorks> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/top"))
     }
 
     /// Get all the works of an user.
-    pub fn user_all_works(&self, user_id: i32) -> GetRequest<UserAllWorks> {
+    pub fn user_all_works(&self, user_id: i32) -> GetRequest<'_, UserAllWorks> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/user/{user_id}/profile/all"))
     }
 
     /// Get the info of an illust.
-    pub fn illust_info(&self, illust_id: i32) -> GetRequest<IllustInfo> {
+    pub fn illust_info(&self, illust_id: i32) -> GetRequest<'_, IllustInfo> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}"))
     }
 
     /// Get pages of an illust.
-    pub fn illust_pages(&self, illust_id: i32) -> GetRequest<Vec<IllustImage>> {
+    pub fn illust_pages(&self, illust_id: i32) -> GetRequest<'_, Vec<IllustImage>> {
         self.get(format!("{BASE_URL_HTTPS}/ajax/illust/{illust_id}/pages"))
     }
 
